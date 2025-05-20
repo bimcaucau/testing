@@ -409,11 +409,21 @@ class HybridEncoder(nn.Module):
                 #     pos_embed = getattr(self, f'pos_embed{enc_ind}', None).to(src_flatten.device)
                 if self.training or self.eval_spatial_size is None:  
                     # Get the actual spatial dimensions from the feature map  
-                    h, w = src_flatten.shape[0], src_flatten.shape[1] // self.hidden_dim  
+                    h, w = proj_feats[enc_ind].shape[2:]  
+                    # Rebuild positional embeddings based on actual dimensions  
                     pos_embed = self.build_2d_sincos_position_embedding(  
                         w, h, self.hidden_dim, self.pe_temperature).to(src_flatten.device)  
                 else:  
-                    pos_embed = getattr(self, f'pos_embed{enc_ind}', None).to(src_flatten.device)
+                    # For evaluation, we can pre-compute the positional embeddings  
+                    # But we need to ensure they match the actual dimensions  
+                    stored_embed = getattr(self, f'pos_embed{enc_ind}', None)  
+                    if stored_embed is not None and stored_embed.shape[1] == src_flatten.shape[1]:  
+                        pos_embed = stored_embed.to(src_flatten.device)  
+                    else:  
+                        # If dimensions don't match, rebuild the embeddings  
+                        h, w = proj_feats[enc_ind].shape[2:]  
+                        pos_embed = self.build_2d_sincos_position_embedding(  
+                            w, h, self.hidden_dim, self.pe_temperature).to(src_flatten.device)
                 memory :torch.Tensor = self.encoder[i](src_flatten, pos_embed=pos_embed)
                 proj_feats[enc_ind] = memory.permute(0, 2, 1).reshape(-1, self.hidden_dim, h, w).contiguous()
 
