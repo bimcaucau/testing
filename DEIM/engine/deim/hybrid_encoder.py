@@ -445,6 +445,9 @@ class HybridEncoder(nn.Module):
             feat_low = outs[-1]
             feat_height = inner_outs[idx + 1]
             downsample_feat = self.downsample_convs[idx](feat_low)
+            if downsample_feat.shape[2:] != feat_height.shape[2:]:  
+                # Resize downsample_feat to match feat_height's spatial dimensions  
+                downsample_feat = F.interpolate(downsample_feat, size=feat_height.shape[2:], mode='bilinear', align_corners=False)  
             out = self.pan_blocks[idx](torch.concat([downsample_feat, feat_height], dim=1))
             outs.append(out)
 
