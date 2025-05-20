@@ -15,8 +15,8 @@ from .timm_model import TimmModel
 from .torchvision_model import TorchVisionModel
 
 from .csp_resnet import CSPResNet
-from .csp_darknet import CSPDarkNet, CSPPAN
+from .csp_darknet import CSPDarkNet, HSFPN_CSPPAN
 
 from .hgnetv2 import HGNetv2
 
-from .HSFPN_CSPPAN_style import HSFPN_CSPStyle
+from .HSFPN_CSPPAN_style import HSFPN_CSPPAN
