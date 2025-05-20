@@ -26,14 +26,29 @@ class DEIM(nn.Module):
         self.fpn = fpn
 
     def forward(self, x, targets=None):
-        x = self.backbone(x)
-
-        if self.fpn is not None:
-            x = self.fpn(x)
-
-        x = self.encoder(x)
-        x = self.decoder(x, targets)
-
+        features = self.backbone(x)  
+        
+        # Use FPN if it exists  
+        if self.fpn is not None:  
+            # Make sure features is a list  
+            if not isinstance(features, list):  
+                features = [features]  
+                
+            # Print debug information  
+            print(f"Backbone output shapes: {[f.shape for f in features]}")  
+            
+            try:  
+                features = self.fpn(features)  
+            except Exception as e:  
+                print(f"Error in FPN: {e}")  
+                # Print more detailed information about the shapes  
+                print(f"FPN in_channels: {self.fpn.in_channels}")  
+                print(f"Feature shapes: {[f.shape for f in features]}")  
+                raise  
+        
+        x = self.encoder(features)  
+        x = self.decoder(x, targets)  
+    
         return x
 
     def deploy(self, ):

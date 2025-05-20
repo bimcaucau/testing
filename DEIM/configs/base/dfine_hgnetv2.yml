@@ -14,14 +14,14 @@ DEIM:
   encoder: HybridEncoder
   decoder: DFINETransformer
 
-HSFPN_CSPPAN:
-  in_channels: [512, 1024, 2048]  # Match HGNetv2 output channels  
-  out_channels: 256  # Single value for uniform channels  
+HSFPN_CSPPAN:  
+  in_channels: [128, 512, 1024]  # These should match the output channels of HGNetv2 at the selected return_idx  
+  out_channels: 256  
   depth: 1  
   use_sdp: True  
-  mode: 'both'  # Options: 'hsfpn', 'csppan', 'both'  
+  mode: 'both'  
   act: 'silu'
-
+  
 # Add, default for step lr scheduler 
 lrsheduler: flatcosine
 lr_gamma: 1
