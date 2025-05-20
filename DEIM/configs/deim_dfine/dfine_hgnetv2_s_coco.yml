@@ -24,9 +24,9 @@ DFINETransformer:
   eval_idx: -1  # -2 -3 -4
 
 HybridEncoder:
-  in_channels: [256, 512, 1024]
-  hidden_dim: 256
-  depth_mult: 0.34
+  in_channels: [256, 256, 256]  # Match HSFPN_CSPPAN out_channels  
+  hidden_dim: 256  
+  depth_mult: 0.34  
   expansion: 0.5
 
 optimizer:
