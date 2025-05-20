@@ -635,19 +635,38 @@ class DFINETransformer(nn.Module):
                            denoising_logits=None,
                            denoising_bbox_unact=None):
 
-        # prepare input for decoder
-        if self.training or self.eval_spatial_size is None:
-            anchors, valid_mask = self._generate_anchors(spatial_shapes, device=memory.device)
-        else:
-            anchors = self.anchors
-            valid_mask = self.valid_mask
-        if memory.shape[0] > 1:
-            anchors = anchors.repeat(memory.shape[0], 1, 1)
+        # # prepare input for decoder
+        # if self.training or self.eval_spatial_size is None:
+        #     anchors, valid_mask = self._generate_anchors(spatial_shapes, device=memory.device)
+        # else:
+        #     anchors = self.anchors
+        #     valid_mask = self.valid_mask
+        # if memory.shape[0] > 1:
+        #     anchors = anchors.repeat(memory.shape[0], 1, 1)
 
-        # memory = torch.where(valid_mask, memory, 0)
-        # TODO fix type error for onnx export
-        memory = valid_mask.to(memory.dtype) * memory
-
+        # # memory = torch.where(valid_mask, memory, 0)
+        # # TODO fix type error for onnx export
+        # memory = valid_mask.to(memory.dtype) * memory
+    # prepare input for decoder  
+        if self.training or self.eval_spatial_size is None:  
+            # Generate anchors based on actual spatial shapes  
+            anchors, valid_mask = self._generate_anchors(spatial_shapes, device=memory.device)  
+        else:  
+            anchors = self.anchors  
+            valid_mask = self.valid_mask  
+        
+        # Ensure valid_mask has the same shape as memory  
+        if valid_mask.shape[1] != memory.shape[1]:  
+            print(f"Mismatch between valid_mask shape {valid_mask.shape} and memory shape {memory.shape}")  
+            # Regenerate valid_mask with correct dimensions  
+            _, valid_mask = self._generate_anchors(spatial_shapes, device=memory.device)  
+        
+        if memory.shape[0] > 1:  
+            anchors = anchors.repeat(memory.shape[0], 1, 1)  
+        
+        # Apply valid mask to memory  
+        memory = valid_mask.to(memory.dtype) * memory  
+      
         output_memory :torch.Tensor = self.enc_output(memory)
         enc_outputs_logits :torch.Tensor = self.enc_score_head(output_memory)
 
