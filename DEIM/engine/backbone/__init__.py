@@ -19,4 +19,4 @@ from .csp_darknet import CSPDarkNet, HSFPN_CSPPAN
 
 from .hgnetv2 import HGNetv2
 
-from .HSFPN_CSPPAN_style import HSFPN_CSPPAN
+
