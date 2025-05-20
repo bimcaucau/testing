@@ -41,8 +41,7 @@ class DEIM(nn.Module):
                 features = self.fpn(features)  
             except Exception as e:  
                 print(f"Error in FPN: {e}")  
-                # Print more detailed information about the shapes  
-                print(f"FPN in_channels: {self.fpn.in_channels}")  
+                # Don't try to access in_channels directly  
                 print(f"Feature shapes: {[f.shape for f in features]}")  
                 raise  
         
